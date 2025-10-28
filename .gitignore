@@ -1,0 +1,12 @@
+.git
+
+# LaTex
+*.aux
+*.log
+*.pdf
+*.tex
+
+/data/*.csv
+/data/*.ods
+/data/*.xlsx
+
