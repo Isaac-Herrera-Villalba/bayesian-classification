@@ -3,8 +3,8 @@
 # Descripción:
 # Automatiza la ejecución del proyecto bayesian-classification.
 # Incluye la creación del entorno virtual, instalación de dependencias,
-# ejecución del clasificador bayesiano y generación automática del
-# reporte final en PDF mediante LaTeX.
+# ejecución del clasificador bayesiano y compilación del reporte
+# en PDF mediante LaTeX.
 # -----------------------------------------------------------------------
 
 PYTHON        = python3
@@ -18,9 +18,10 @@ VENV_DIR      = .venv
 PYTHON_VENV   = $(VENV_DIR)/bin/python
 PIP_VENV      = $(VENV_DIR)/bin/pip
 
-PDF_FILE      = $(OUT_DIR)/reporte.pdf
+PDF_FILE      = $(OUT_DIR)/reporte_1.pdf
+TEX_FILE      = $(OUT_DIR)/reporte_1.tex  # el nombre que genera render_pdf()
 
-.PHONY: all help env run pdf view clean full
+.PHONY: all help env run latex pdf view clean full
 
 # -----------------------------------------------------------------------
 all: help
@@ -28,11 +29,12 @@ all: help
 help:
 	@echo "Comandos disponibles:"
 	@echo "  make env    -> Crea entorno virtual e instala dependencias"
-	@echo "  make run    -> Ejecuta el clasificador bayesiano (genera PDF automático)"
-	@echo "  make pdf    -> Genera solo el reporte PDF desde input.txt"
+	@echo "  make run    -> Ejecuta el clasificador bayesiano (genera .tex y PDF automático)"
+	@echo "  make latex  -> Compila manualmente el archivo .tex con LaTeX"
+	@echo "  make pdf    -> Alias de make run (genera reporte PDF desde input.txt)"
 	@echo "  make view   -> Abre el PDF resultante"
 	@echo "  make clean  -> Elimina archivos temporales y auxiliares de LaTeX"
-	@echo "  make full   -> Ejecuta todo el flujo (run + view)"
+	@echo "  make full   -> Ejecuta todo el flujo (env + run + latex + view)"
 	@echo "---------------------------------------------------------------"
 
 # -----------------------------------------------------------------------
@@ -54,23 +56,33 @@ run:
 	@echo "=== Ejecutando clasificador bayesiano ==="
 	mkdir -pv $(OUT_DIR)/
 	$(PYTHON_VENV) -m $(SRC_DIR).main $(INPUT_FILE)
+	@echo "[OK] Ejecución completada. Si el .tex fue generado, puedes compilarlo con 'make latex'"
 
-pdf:
-	@echo "=== Generando reporte PDF ==="
-	$(PYTHON_VENV) $(MAIN_FILE) $(INPUT_FILE)
+pdf: run
+
+# -----------------------------------------------------------------------
+latex:
+	@echo "=== Compilando LaTeX manualmente con pdflatex ==="
+	@if [ -f "$(TEX_FILE)" ]; then \
+		cd $(OUT_DIR) && \
+		pdflatex -interaction=nonstopmode $(notdir $(TEX_FILE)) >/dev/null 2>&1; \
+		echo "[OK] Compilación LaTeX completada: $(PDF_FILE)"; \
+	else \
+		echo "[ERROR] No se encontró $(TEX_FILE). Ejecuta primero 'make run'."; \
+	fi
 
 # -----------------------------------------------------------------------
 view:
 	@echo "Abriendo PDF con Okular..."
 	$(PDF_READER) $(PDF_FILE) &
 
-full: run view
+full: run latex view
 
 # -----------------------------------------------------------------------
 clean:
 	@echo "Eliminando archivos generados..."
 	rm -rf $(OUT_DIR)/
-	find . -type f -name "*.aux" -o -name "*.log" -o -name "*.out" -o -name "*.toc" -o -name "*.tex" -delete
+	find . -type f \( -name "*.aux" -o -name "*.log" -o -name "*.out" -o -name "*.toc" -o -name "*.tex" -o -name "*.synctex.gz" \) -delete
 	rm -rf $(SRC_DIR)/__pycache__
 	@echo "Limpieza completada."
 

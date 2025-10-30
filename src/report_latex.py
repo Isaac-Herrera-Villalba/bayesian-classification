@@ -142,4 +142,5 @@ def render_pdf(
             continue
 
     print(f"[WARN] No se pudo compilar PDF, se dejó el archivo TEX en: {tex_path}")
+# ---------------------------------------------------------------------------------
 

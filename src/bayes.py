@@ -58,4 +58,5 @@ def run_naive_bayes(df, target, attrs, instance, alpha=0.0) -> BayesResult:
     conds, raw_counts = conditional_tables(df, target, attrs, alpha)
     scores, post = evaluate_instance(priors, conds, instance)
     return BayesResult(priors, conds, raw_counts, scores, post)
+# ---------------------------------------------------------------------------------
 

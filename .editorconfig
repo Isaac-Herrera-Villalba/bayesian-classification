@@ -33,7 +33,8 @@ indent_size = 4
 [*.py]
 indent_style = space
 indent_size = 4
-max_line_length = 88   # Recomendado por Black
+# Recomendado por Black
+max_line_length = 88
 trim_trailing_whitespace = true
 insert_final_newline = true
 

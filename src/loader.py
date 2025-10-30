@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
 '''
 src/loader.py
@@ -7,44 +8,68 @@ src/loader.py
 from __future__ import annotations
 from pathlib import Path
 import pandas as pd
+import numpy as np
+
+
+def _detect_table(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Detecta automáticamente el bloque de datos (elimina filas/columnas vacías iniciales)
+    y ajusta el encabezado a la primera fila no vacía.
+    """
+    # Elimina columnas completamente vacías
+    df = df.dropna(axis=1, how="all")
+
+    # Encuentra la primera fila con al menos un valor no nulo
+    first_valid_row = None
+    for i, row in df.iterrows():
+        if row.notna().any():
+            first_valid_row = i
+            break
+
+    if first_valid_row is None:
+        raise ValueError("No se detectaron datos válidos en el archivo.")
+
+    # Usa esa fila como encabezado y recorta las filas anteriores
+    new_header = df.iloc[first_valid_row].astype(str)
+    df = df.iloc[first_valid_row + 1:].copy()
+    df.columns = new_header
+
+    # Elimina filas completamente vacías restantes
+    df = df.dropna(how="all")
+
+    # Convierte todas las columnas a string por consistencia
+    df.columns = [str(c).strip() for c in df.columns]
+    df = df.astype(str)
+
+    return df.reset_index(drop=True)
 
 
 def load_dataset(path: str, sheet: str | None = None) -> pd.DataFrame:
     """
-    Carga el dataset desde un archivo CSV, XLSX o ODS.
-    Si sheet (o hoja) está definido, lo usa para seleccionar la hoja;
-    de lo contrario, carga la primera hoja disponible.
+    Carga un dataset desde un archivo CSV, XLSX o ODS,
+    detectando automáticamente la región de la tabla (sin importar posición).
     """
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(f"Dataset no encontrado: {path}")
 
     ext = p.suffix.lower()
+
+    # --- Carga según tipo de archivo ---
     if ext == ".csv":
-        df = pd.read_csv(p)
+        df = pd.read_csv(p, encoding="utf-8", header=None)
 
     elif ext in {".xlsx", ".xls"}:
-        try:
-            if sheet:
-                df = pd.read_excel(p, sheet_name=sheet, engine="openpyxl")
-            else:
-                df = pd.read_excel(p, sheet_name=0, engine="openpyxl")
-        except ValueError as e:
-            raise ValueError(f"No se encontró la hoja '{sheet}' en el archivo Excel.") from e
+        df = pd.read_excel(p, sheet_name=sheet or 0, engine="openpyxl", header=None)
 
     elif ext == ".ods":
-        try:
-            if sheet:
-                df = pd.read_excel(p, sheet_name=sheet, engine="odf")
-            else:
-                df = pd.read_excel(p, sheet_name=0, engine="odf")
-        except ValueError as e:
-            raise ValueError(f"No se encontró la hoja '{sheet}' en el archivo ODS.") from e
+        df = pd.read_excel(p, sheet_name=sheet or 0, engine="odf", header=None)
 
     else:
         raise ValueError(f"Formato no soportado: {ext}")
 
-    # Convertimos todas las columnas a string por consistencia
-    df.columns = [str(c) for c in df.columns]
+    # --- Detección automática del bloque de datos ---
+    df = _detect_table(df)
     return df
+# ---------------------------------------------------------------------------------
 

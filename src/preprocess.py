@@ -18,4 +18,5 @@ def discretize(df: pd.DataFrame, attrs: list[str], bins: int = 5, strategy: str 
             else:
                 df_copy[col] = pd.cut(df_copy[col], bins=bins)
     return df_copy
+# ---------------------------------------------------------------------------------
 
