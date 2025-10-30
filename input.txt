@@ -1,0 +1,19 @@
+## input.txt
+
+# Archivo de configuración para el clasificador bayesiano
+DATASET=./data/peliculas.ods
+SHEET=Sheet1
+TARGET_COLUMN=Género
+USE_ALL_ATTRIBUTES=true
+
+# Para .xlsx/.ods puedes opcionalmente indicar:
+# SHEET=Hoja1
+
+#DATASET=./data/peliculas.xlsx
+#HOJA=Sheet1
+#TARGET_COLUMN=Calificación
+#USE_ALL_ATTRIBUTES=true
+#
+#INSTANCE:
+#  Género=Acción
+

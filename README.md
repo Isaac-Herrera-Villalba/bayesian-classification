@@ -9,15 +9,37 @@
 · Sampayo Aguilar Cinthia Gloricel  
 · Velarde Valencia Josue  
 
-### Descripción
+---
 
-Este programa analiza expresiones de **lógica proposicional** y **secuentes**, determinando su validez mediante evaluación semántica y deducción formal.
+## Proyecto: Clasificación Bayesiana
 
-Para cada fórmula, el sistema identifica si es:
+### Descripción general
 
-- **Válida (Tautología):** verdadera en todas las interpretaciones posibles.  
-- **Satisfacible (Contingente):** verdadera en al menos una interpretación, pero no en todas.  
-- **Insatisfacible (Contradicción):** falsa en todas las interpretaciones posibles.
+Este programa implementa un **clasificador Bayesiano Naive** capaz de analizar datasets (mal llamados “bases de datos”) en formato **CSV**, **XLSX** o **ODS**, para **inferir clases probables** a partir de uno o más atributos seleccionados por el usuario.
 
-En caso de que la expresión sea **válida** o el secuente sea **derivable**, el programa genera automáticamente su **árbol de derivación** y produce un **reporte en formato PDF**, utilizando **LaTeX** para la representación formal y visual de los resultados.
+El sistema permite al usuario especificar en un archivo de texto (`input.txt`) las características del análisis:
+
+- Ruta y formato del dataset.  
+- Columna objetivo (la variable de clase).  
+- Atributos a utilizar como filtros.  
+- Valores específicos de esos atributos para generar la predicción.  
+- Opciones adicionales como suavizado de Laplace o discretización automática de atributos numéricos.
+
+El programa detecta automáticamente el número de columnas y el tipo de cada atributo, permitiendo trabajar con datasets de distinta naturaleza (películas, productos, usuarios, etc.) manteniendo la misma estructura conceptual.
+
+---
+
+### Funcionamiento
+
+1. **Entrada**  
+   El usuario proporciona un archivo `input.txt` con la configuración y los valores de entrada.  
+   Ejemplo:
+   ```txt
+   DATASET=./data/peliculas.xlsx
+   TARGET_COLUMN=Calificación
+   USE_ALL_ATTRIBUTES=true
+
+   INSTANCE:
+     Género=Acción
+     Usuario=M
 
