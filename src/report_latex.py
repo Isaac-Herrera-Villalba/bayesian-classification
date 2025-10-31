@@ -3,11 +3,12 @@
 
 '''
 src/report_latex.py
-versión final:
-- vista previa del dataset (con límite de filas/columnas)
-- cálculo paso a paso con fracciones y decimales en una sola línea
-- texto explicativo y conclusión automática
-- puntos decimales uniformes
+Versión final:
+- Vista previa del dataset (con límite de filas/columnas)
+- Cálculo paso a paso con fracciones y decimales en una sola línea
+- Texto explicativo y conclusión automática
+- Puntos decimales uniformes
+- Saltos automáticos en ecuaciones largas
 '''
 
 from __future__ import annotations
@@ -25,9 +26,14 @@ latex_template = r"""
 \usepackage[utf8]{inputenc}
 \usepackage{booktabs}
 \usepackage{amsmath}
-\usepackage{siunitx}
+\usepackage{breqn}
+\usepackage{microtype}
+\usepackage{ragged2e}
+
+
 \sisetup{output-decimal-marker={.}}
 \begin{document}
+\RaggedRight
 
 \section*{Clasificación Bayesiana}
 
@@ -122,7 +128,11 @@ def build_trace(
     posteriors: Dict[str, float] | None = None,
     raw_counts: Dict[str, pd.DataFrame] | None = None
 ) -> str:
-    """Construye las expresiones del cálculo paso a paso."""
+    """
+    Construye las expresiones del cálculo paso a paso:
+    P(c) × P(A=v|c) = fracciones × fracciones = decimales × decimales = resultado
+    Usa breqn (dmath*) para ajuste automático de ecuaciones largas.
+    """
     if not instance:
         return "\\textit{No se proporcionó una instancia.}"
 
@@ -133,6 +143,7 @@ def build_trace(
         ""
     ]
 
+    # Total general
     total_general = None
     if raw_counts:
         any_table = next(iter(raw_counts.values()))
@@ -175,20 +186,36 @@ def build_trace(
         # Construcción de la línea completa
         frac_expr = " \\times ".join(frac_parts) if frac_parts else ""
         dec_expr = " \\times ".join(parts)
-        line_expr = (
-            f"\\[P({c}) \\times " +
+
+        base_expr = (
+            f"P({c}) \\times " +
             " \\times ".join([f"P({a}={v}|{c})" for a, v in instance.items()]) + " = " +
             (frac_expr + " = " if frac_expr else "") +
-            f"{dec_expr} = {prod_str}\\]"
+            f"{dec_expr} = {prod_str}"
         )
+
+        # Si la ecuación es muy larga, usa breqn y reduce ligeramente la fuente
+        if len(base_expr) > 120:
+            line_expr = (
+                "\\begingroup\n"
+                "\\scriptsize\n"
+                "\\begin{dmath*}\n"
+                f"{base_expr}\n"
+                "\\end{dmath*}\n"
+                "\\endgroup"
+            )
+        else:
+            line_expr = f"\\[{base_expr}\\]"
+
+        # Agregamos la ecuación
         lines.append(line_expr)
 
+    # Conclusión final
     if posteriors:
         best = max(posteriors, key=posteriors.get)
         lines.append(f"Por lo tanto, la clase predicha para esta instancia es \\textbf{{{best}}}.")
 
     return "\n".join(lines)
-
 
 # -------------------------------------------------------------------
 def render_pdf(
