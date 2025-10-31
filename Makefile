@@ -101,5 +101,6 @@ clean:
 	rm -rf $(OUT_DIR)/
 	find . -type f \( -name "*.aux" -o -name "*.log" -o -name "*.out" -o -name "*.toc" -o -name "*.tex" -o -name "*.synctex.gz" \) -delete
 	rm -rf $(SRC_DIR)/__pycache__
+	rm -f data/.~lock.*
 	@echo "Limpieza completada."
 
