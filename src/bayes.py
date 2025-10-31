@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 '''
-src/preprocess.py
+src/bayes.py
 '''
 
 from __future__ import annotations

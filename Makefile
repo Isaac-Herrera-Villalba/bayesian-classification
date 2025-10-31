@@ -14,14 +14,20 @@ INPUT_FILE    = input.txt
 MAIN_FILE     = $(SRC_DIR)/main.py
 PDF_READER    = okular
 
+SPREADSHEET = libreoffice
+EXT = ods
+
+DATASET = peliculas
+DATASET_PATH = data/$(DATASET).$(EXT)
+
 VENV_DIR      = .venv
 PYTHON_VENV   = $(VENV_DIR)/bin/python
 PIP_VENV      = $(VENV_DIR)/bin/pip
 
 PDF_FILE      = $(OUT_DIR)/reporte_1.pdf
-TEX_FILE      = $(OUT_DIR)/reporte_1.tex  # el nombre que genera render_pdf()
+TEX_FILE      = $(OUT_DIR)/reporte_1.tex
 
-.PHONY: all help env run latex pdf view clean full
+.PHONY: all help env run latex pdf view clean full show_dataset
 
 # -----------------------------------------------------------------------
 all: help
@@ -72,11 +78,22 @@ latex:
 	fi
 
 # -----------------------------------------------------------------------
+show_dataset:
+	@echo "Muestra el dataset utilizado"
+	@if [ -n "$$DISPLAY" ]; then \
+		echo "[OK] Abriendo $(DATASET_PATH) con LibreOffice..."; \
+		$(SPREADSHEET) "$(DATASET_PATH)" & \
+	else \
+		echo "[ERROR] No hay entorno gráfico (DISPLAY). Ejecuta este comando dentro de una sesión con GUI."; \
+	fi
+
+# -----------------------------------------------------------------------
 view:
 	@echo "Abriendo PDF con Okular..."
 	$(PDF_READER) $(PDF_FILE) &
 
-full: run latex view
+# -----------------------------------------------------------------------
+full: run latex view show_dataset
 
 # -----------------------------------------------------------------------
 clean:

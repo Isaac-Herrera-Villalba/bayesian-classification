@@ -93,7 +93,8 @@ def main():
 
         if cfg.report_path:
             out = cfg.report_path.replace(".pdf", f"_{idx}.pdf")
-            render_pdf(out, df, target, attrs, res.priors, res.cond_tables, inst_norm, res.posteriors)
+            render_pdf(out, df, target, attrs, res.priors, res.cond_tables, inst_norm, res.posteriors, res.raw_counts)
+
             print(f"[OK] Reporte: {out}")
 
     print("[OK] Ejecución completada. Si el .tex fue generado, puedes compilarlo con 'make latex'.")
