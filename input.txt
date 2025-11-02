@@ -4,20 +4,30 @@ input.txt
 
 # Archivo de configuración para el clasificador bayesiano
 DATASET=data/peliculas.ods
-SHEET=Sheet4
+SHEET=Sheet1
 TARGET_COLUMN=Calificación
 USE_ALL_ATTRIBUTES=true
 REPORT=output/reporte.pdf
 
+# LAPLACE_ALPHA=1
+
+# Sheet1
+INSTANCE:
+  Género=Acción
+
 /*
+# Sheet2
 INSTANCE:
   Usuario=M
   Género=Acción
 */
 
+/*
+# Sheet4
 INSTANCE:
-  Director=Buñuel
-  Productora=Disney
+  Director=Del Toro
+  Productora=Warner
   Usuario=M
   Género=Acción
+*/
 
