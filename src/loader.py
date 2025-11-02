@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-'''
-src/loader.py
-'''
+"""
+ src/loader.py
+ ------------------------------------------------------------
+ Descripción:
+
+ Módulo encargado de cargar datasets desde distintos formatos 
+ (CSV, XLSX, ODS) y detectar automáticamente la tabla de datos 
+ ignorando filas o columnas vacías.
+ """
 
 from __future__ import annotations
 from pathlib import Path
 import pandas as pd
 import numpy as np
 
-
+#Detecta automáticamente el bloque de datos (elimina filas/columnas vacías iniciales) y ajusta el encabezado a la primera fila no vacía.
 def _detect_table(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Detecta automáticamente el bloque de datos (elimina filas/columnas vacías iniciales)
-    y ajusta el encabezado a la primera fila no vacía.
-    """
     # Elimina columnas completamente vacías
     df = df.dropna(axis=1, how="all")
 
@@ -43,12 +45,8 @@ def _detect_table(df: pd.DataFrame) -> pd.DataFrame:
 
     return df.reset_index(drop=True)
 
-
+# Carga un dataset desde un archivo CSV, XLSX o ODS, detectando automáticamente la región de la tabla (sin importar posición).
 def load_dataset(path: str, sheet: str | None = None) -> pd.DataFrame:
-    """
-    Carga un dataset desde un archivo CSV, XLSX o ODS,
-    detectando automáticamente la región de la tabla (sin importar posición).
-    """
     p = Path(path)
     if not p.exists():
         raise FileNotFoundError(f"Dataset no encontrado: {path}")
