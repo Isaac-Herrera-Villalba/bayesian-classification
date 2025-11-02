@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 
-'''
-src/config.py
-'''
+"""
+ src/config.py
+ ------------------------------------------------------------
+ Descripción:
+
+ Módulo encargado de leer y procesar un archivo de configuración 
+ (input.txt) con soporte para pares clave=valor, instancias, y 
+ comentarios.
+"""
 
 from __future__ import annotations
 from pathlib import Path
 from typing import Dict, List, Optional
 from .utils import parse_bool
 
-
+# Clase principal que administra la carga, interpretación y validación del archivo de configuración
+class Config:
 class Config:
     def __init__(self, path: str):
         self.path = Path(path)
@@ -21,8 +28,8 @@ class Config:
         self._parse()
         self._validate_duplicates()
 
-    # ------------------------------------------------------------
 
+    # Analiza el archivo input.txt, detectando claves, valores e instancias
     def _parse(self):
         # Lee input.txt e interpreta pares clave=valor e instancias, con soporte para comentarios de bloque y línea.
         current_instance = None
@@ -57,16 +64,19 @@ class Config:
                         self.instances.append(current_instance)
                     current_instance = {}
                     continue
-
+                    
+                # Solo procesa líneas con formato clave=valor
                 if "=" not in line:
                     continue
 
                 k, v = line.split("=", 1)
                 k, v = k.strip(), v.strip()
 
+                # Si estamos dentro de una instancia, guarda ahí
                 if current_instance is not None:
                     current_instance[k] = v
                 else:
+                    # Si la clave ya existe, guarda múltiples valores como lista
                     if k in self.kv:
                         prev = self.kv[k]
                         if not isinstance(prev, list):
@@ -76,10 +86,11 @@ class Config:
                     else:
                         self.kv[k] = v
 
+         # Agrega la última instancia encontrada (si existe)
         if current_instance:
             self.instances.append(current_instance)
 
-    # ------------------------------------------------------------
+    # Verifica duplicados en claves críticas
     def _validate_duplicates(self):
         """Verifica si hay claves críticas duplicadas como DATASET o TARGET_COLUMN."""
         critical = ("DATASET", "TARGET_COLUMN")
@@ -93,15 +104,17 @@ class Config:
                 )
                 raise ValueError(msg)
 
-    # ------------------------------------------------------------
+    
     # === Claves globales ===
+    # Ruta del dataset
     @property
     def dataset(self) -> str:
         v = self.kv.get("DATASET", "")
         if isinstance(v, list):
             v = v[-1]  # seguridad extra (nunca debería llegar aquí)
         return v.strip()
-
+        
+    # Nombre de la hoja del archivo (en caso de Excel)
     @property
     def sheet(self) -> Optional[str]:
         """
@@ -118,6 +131,7 @@ class Config:
                 return val
         return None
 
+    # Columna objetivo para la clasificación
     @property
     def target_column(self) -> Optional[str]:
         v = self.kv.get("TARGET_COLUMN")
@@ -125,10 +139,12 @@ class Config:
             v = v[-1]
         return v
 
+    # Indica si se usarán todos los atributos del dataset
     @property
     def use_all_attributes(self) -> bool:
         return parse_bool(self.kv.get("USE_ALL_ATTRIBUTES", "true"))
 
+    # Lista explícita de atributos seleccionados
     @property
     def attributes(self) -> Optional[List[str]]:
         raw = self.kv.get("ATTRIBUTES")
@@ -138,6 +154,7 @@ class Config:
             raw = raw[-1]
         return [c.strip() for c in raw.split(",") if c.strip()]
 
+    # Parámetro de suavizado de Laplace
     @property
     def laplace_alpha(self) -> float:
         try:
@@ -148,6 +165,7 @@ class Config:
         except Exception:
             return 0.0
 
+    # Ruta del reporte de salida
     @property
     def report_path(self) -> Optional[str]:
         v = self.kv.get("REPORT")
@@ -155,6 +173,7 @@ class Config:
             v = v[-1]
         return v
 
+    # Modo de tratamiento de variables numéricas
     @property
     def numeric_mode(self) -> str:
         v = self.kv.get("NUMERIC_MODE", "raw")
@@ -162,6 +181,7 @@ class Config:
             v = v[-1]
         return v
 
+    # Número de bins para discretización
     @property
     def bins(self) -> int:
         try:
@@ -172,6 +192,7 @@ class Config:
         except Exception:
             return 5
 
+    # Estrategia usada para discretizar variables numéricas
     @property
     def discretize_strategy(self) -> str:
         v = self.kv.get("DISCRETIZE_STRATEGY", "quantile")
