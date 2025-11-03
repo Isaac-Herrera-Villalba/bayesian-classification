@@ -5,8 +5,8 @@
  ------------------------------------------------------------
  Descripción:
 
- Módulo encargado de leer y procesar un archivo de configuración 
- (input.txt) con soporte para pares clave=valor, instancias, y 
+ Módulo encargado de leer y procesar un archivo de configuración
+ (input.txt) con soporte para pares clave=valor, instancias, y
  comentarios.
 """
 
@@ -16,7 +16,6 @@ from typing import Dict, List, Optional
 from .utils import parse_bool
 
 # Clase principal que administra la carga, interpretación y validación del archivo de configuración
-class Config:
 class Config:
     def __init__(self, path: str):
         self.path = Path(path)
@@ -64,7 +63,7 @@ class Config:
                         self.instances.append(current_instance)
                     current_instance = {}
                     continue
-                    
+
                 # Solo procesa líneas con formato clave=valor
                 if "=" not in line:
                     continue
@@ -104,7 +103,7 @@ class Config:
                 )
                 raise ValueError(msg)
 
-    
+
     # === Claves globales ===
     # Ruta del dataset
     @property
@@ -113,7 +112,7 @@ class Config:
         if isinstance(v, list):
             v = v[-1]  # seguridad extra (nunca debería llegar aquí)
         return v.strip()
-        
+
     # Nombre de la hoja del archivo (en caso de Excel)
     @property
     def sheet(self) -> Optional[str]:

@@ -32,9 +32,10 @@ latex_template = r"""
 \usepackage{breqn}
 \usepackage{microtype}
 \usepackage{ragged2e}
+\usepackage{siunitx}
 
+\sisetup{output-decimal-marker = {.}}
 
-\sisetup{output-decimal-marker={.}}
 \begin{document}
 \RaggedRight
 
@@ -244,7 +245,7 @@ def render_pdf(
     post_rows = "\n".join(f"{c} & {p:.6f}".replace(",", ".") + " \\\\" for c, p in posteriors.items())
     pred = max(posteriors, key=posteriors.get) if posteriors else "—"
     dataset_table = dataset_preview_table(df)
-    
+
     # Inserta los valores en la plantilla LaTeX
     tex_content = latex_template % {
         "rows": rows,
@@ -279,6 +280,7 @@ def render_pdf(
             return
         except Exception:
             continue
-            
+
 # Aviso si no se logra compilar el PDF
     print(f"[WARN] No se pudo compilar PDF, se dejó el archivo TEX en: {tex_path}")
+
