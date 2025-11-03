@@ -18,7 +18,6 @@ from .preprocess import discretize
 from .bayes import run_naive_bayes
 from .report_latex import render_pdf
 
-
 # Normaliza cadenas para comparación (quita tildes, minúsculas, sin espacios extra).
 def normalize_str(s: str) -> str:
     s = str(s).strip().lower()
@@ -105,7 +104,6 @@ def main():
             print(f"[OK] Reporte: {out}")
 
     print("[OK] Ejecución completada. Si el .tex fue generado, puedes compilarlo con 'make latex'.")
-
 
 # Punto de entrada del script
 if __name__ == "__main__":
