@@ -55,14 +55,13 @@ def select_columns(df, cfg):
 
     return attrs, target, normalized_cols
 
-
 # Función principal: controla la ejecución del programa
 def main():
     # Verificación de argumentos del programa
     if len(sys.argv) != 2:
         print("Uso: python -m src.main input.txt")
         sys.exit(1)
-        
+
     # Carga y preparación del archivo de configuración
     cfg = Config(sys.argv[1]) # Carga del dataset
     df = load_dataset(cfg.dataset, cfg.sheet) # Conversión a texto
@@ -111,3 +110,4 @@ def main():
 # Punto de entrada del script
 if __name__ == "__main__":
     main()
+
